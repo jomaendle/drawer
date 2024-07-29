@@ -1,3 +1,28 @@
-<p class=" bg-red-200">drawer works!</p>
+<div class="flex gap-3">
+  <button (click)="addRectangle()">Add Rectangle</button>
+  <button (click)="addCircle()">Add Circle</button>
+  <button (click)="clearCanvas()">Clear Canvas</button>
+</div>
 
-{{data() | json }}
+<canvas
+  (mousedown)="startDrawing($event)"
+  (mousemove)="handleMouseMove($event)"
+  (mouseup)="stopDrawing()"
+  #canvas
+  height="600"
+  width="800"
+  class="bg-gray-100"
+></canvas>
+<button mat-button (click)="save()">Save</button>
+<!-- 
+{{ data() | json }} -->
+
+<p>
+  @for (shape of shapes(); track shape.color) {
+    <div class="flex gap-3">
+      <button (click)="selectShape(shape)">Select</button>
+      <button (click)="deleteShape(shape)">Delete</button>
+      <span>{{ shape.type }}</span>
+    </div>
+  }
+</p>
