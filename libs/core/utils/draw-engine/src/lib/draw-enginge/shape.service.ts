@@ -47,4 +47,17 @@ export class ShapeService {
       })),
     );
   }
+
+  getSelectedShape(): Shape | null {
+    return this.shapes().find((s) => s.isSelected) || null;
+  }
+
+  resetSelection(): void {
+    this.shapes.set(
+      this.shapes().map((s) => ({
+        ...s,
+        isSelected: false,
+      })),
+    );
+  }
 }

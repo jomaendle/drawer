@@ -1,20 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, viewChild } from '@angular/core';
-import { GridService, MovementService, ShapeService } from '@core/draw-engine';
-
-const GRID_SIZE = 20;
-
-interface Shape {
-  type: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  radius: number;
-  color: string;
-  layer: number;
-  isHovered?: boolean;
-}
+import {
+  GridService,
+  MovementService,
+  Shape,
+  ShapeService,
+} from '@core/draw-engine';
 
 @Component({
   selector: 'app-drawer',
@@ -107,7 +98,11 @@ export class DrawerComponent {
 
     const shape = this.shapes().find((shape) => shape.isHovered);
     if (shape) {
-      this.movementService.startMoving(event, shape, this.canvas().nativeElement);
+      this.movementService.startMoving(
+        event,
+        shape,
+        this.canvas().nativeElement,
+      );
     }
   }
 
@@ -154,7 +149,7 @@ export class DrawerComponent {
       this.ctx.fill();
     }
 
-    if (shape.isHovered) {
+    if (shape.isHovered || shape.isSelected) {
       this.ctx.strokeStyle = 'black';
       this.ctx.lineWidth = 3;
       this.ctx.beginPath();
@@ -241,6 +236,13 @@ export class DrawerComponent {
   }
 
   selectShape(shape: Shape): void {
+    if (this.shapeService.getSelectedShape() === shape) {
+      this.currentShape = null;
+      this.shapeService.resetSelection();
+      this.drawAllShapes();
+      return;
+    }
+
     this.shapeService.selectShape(shape);
     this.drawAllShapes();
   }
