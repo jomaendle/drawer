@@ -2,12 +2,17 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   viewChild,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormArray,
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import {
   GridService,
   MovementService,
@@ -31,9 +36,12 @@ export class DrawerComponent {
   private currentShape: Shape | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
 
-  shapeColorFormControl = new FormControl<string>('#000000');
-
   shapes = this.shapeService.shapes;
+
+  shapeColorFormControl = computed(() => {
+    const shapes = this.shapes();
+    return new FormArray(shapes.map((shape) => new FormControl(shape.color)));
+  });
 
   selectedShape = computed(() =>
     this.shapes().find((shape) => shape.isSelected),
@@ -43,14 +51,28 @@ export class DrawerComponent {
     private gridService: GridService,
     private movementService: MovementService,
   ) {
-    this.shapeColorFormControl.valueChanges
-      .pipe(takeUntilDestroyed(), debounceTime(300))
-      .subscribe((color) => {
-        console.log(color);
+    effect(() => {
+      const ctrl = this.shapeColorFormControl();
+
+      if (!ctrl) {
+        return;
+      }
+
+      ctrl.valueChanges.pipe(debounceTime(300)).subscribe((allColors) => {
+        const selectedShape = this.selectedShape();
+
+        if (!selectedShape) {
+          return;
+        }
+
+        const index = this.shapes().indexOf(selectedShape);
+        const color = allColors[index];
+
         if (color) {
-          this.updateShapeColor(color);
+          this.updateShapeColor(selectedShape, color);
         }
       });
+    });
   }
 
   ngOnInit(): void {
@@ -271,13 +293,9 @@ export class DrawerComponent {
     this.drawAllShapes();
   }
 
-  updateShapeColor(color: string): void {
-    const selectedShape = this.selectedShape();
-
-    console.log(selectedShape);
-
-    if (selectedShape) {
-      this.shapeService.updateShapeColor(selectedShape, color);
+  updateShapeColor(shape: Shape, color: string): void {
+    if (shape) {
+      this.shapeService.updateShapeColor(shape, color);
       this.drawAllShapes();
     }
   }

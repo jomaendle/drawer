@@ -18,16 +18,17 @@
 {{ data() | json }} -->
 
 <p>
-  @for (shape of shapes(); track shape.color) {
+  @for (shape of shapes(); track shape.color; let index = $index) {
     <div class="flex gap-3">
       <button (click)="selectShape(shape)">Select</button>
       <button (click)="deleteShape(shape)">Delete</button>
-      <label
+
+      <label (click)="shapeService.selectShape(shape)"
         >Color:
         <input
-          [disabled]="!selectedShape()"
           type="color"
-          [formControl]="shapeColorFormControl"
+          [formControl]="shapeColorFormControl().at(index)"
+          [value]="shape.color"
       /></label>
       <span>{{ shape.type }}</span>
     </div>
