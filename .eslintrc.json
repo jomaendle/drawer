@@ -1,7 +1,7 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nx", "prettier"],
+  "plugins": ["@nx"],
   "extends": ["plugin:@nrwl/nx/angular", "prettier"],
   "rules": {
     "prettier/prettier": ["error"]
@@ -19,6 +19,48 @@
               {
                 "sourceTag": "*",
                 "onlyDependOnLibsWithTags": ["*"]
+              },
+              {
+                "sourceTag": "type:app",
+                "onlyDependOnLibsWithTags": ["type:app", "type:feature"]
+              },
+              {
+                "sourceTag": "type:feature",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:shared",
+                  "type:util"
+                ]
+              },
+              {
+                "sourceTag": "type:util",
+                "onlyDependOnLibsWithTags": ["type:util"]
+              },
+              {
+                "sourceTag": "scope:core",
+                "onlyDependOnLibsWithTags": ["scope:core", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:shared",
+                "onlyDependOnLibsWithTags": ["scope:shared"]
+              },
+              {
+                "sourceTag": "platform:frontend",
+                "onlyDependOnLibsWithTags": [
+                  "platform:frontend",
+                  "platform:shared"
+                ]
+              },
+              {
+                "sourceTag": "platform:shared",
+                "onlyDependOnLibsWithTags": ["platform:shared"]
+              },
+              {
+                "sourceTag": "platform:backend",
+                "onlyDependOnLibsWithTags": [
+                  "platform:backend",
+                  "platform:shared"
+                ]
               }
             ]
           }
