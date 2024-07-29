@@ -35,6 +35,12 @@ export class ShapeService {
     this.shapes.set([]);
   }
 
+  updateShapeColor(shape: Shape, color: string): void {
+    this.shapes.set(
+      this.shapes().map((s) => (s === shape ? { ...s, color } : s)),
+    );
+  }
+
   selectShape(shape: Shape | null): void {
     if (!shape) {
       return;

@@ -1,16 +1,25 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   GridService,
   MovementService,
   Shape,
   ShapeService,
 } from '@core/draw-engine';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-drawer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.css',
 })
@@ -22,12 +31,27 @@ export class DrawerComponent {
   private currentShape: Shape | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
 
+  shapeColorFormControl = new FormControl<string>('#000000');
+
   shapes = this.shapeService.shapes;
+
+  selectedShape = computed(() =>
+    this.shapes().find((shape) => shape.isSelected),
+  );
 
   constructor(
     private gridService: GridService,
     private movementService: MovementService,
-  ) {}
+  ) {
+    this.shapeColorFormControl.valueChanges
+      .pipe(takeUntilDestroyed(), debounceTime(300))
+      .subscribe((color) => {
+        console.log(color);
+        if (color) {
+          this.updateShapeColor(color);
+        }
+      });
+  }
 
   ngOnInit(): void {
     this.ctx = this.canvas().nativeElement.getContext('2d');
@@ -245,5 +269,16 @@ export class DrawerComponent {
 
     this.shapeService.selectShape(shape);
     this.drawAllShapes();
+  }
+
+  updateShapeColor(color: string): void {
+    const selectedShape = this.selectedShape();
+
+    console.log(selectedShape);
+
+    if (selectedShape) {
+      this.shapeService.updateShapeColor(selectedShape, color);
+      this.drawAllShapes();
+    }
   }
 }
