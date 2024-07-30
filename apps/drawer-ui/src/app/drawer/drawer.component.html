@@ -28,6 +28,24 @@
       </svg>
     </button>
 
+    <button (click)="addLineShape()">
+      <svg width="16" height="16">
+        <line
+          x1="1"
+          y1="1"
+          x2="15"
+          y2="15"
+          style="stroke: rgb(0, 0, 0); stroke-width: 2"
+        />
+      </svg>
+    </button>
+
+    <button (click)="addTextShape()">
+      <svg width="16" height="16">
+        <text x="2" y="15" style="font-size: 16px; font-family: Arial">T</text>
+      </svg>
+    </button>
+
     <div class="h-10 w-[1px] bg-gray-500"></div>
 
     <button (click)="addLayer()">Add Layer</button>
@@ -36,9 +54,15 @@
       <ng-icon name="heroXCircle" class="text-2xl" />
       Clear Canvas
     </button>
+
+    <div class="h-10 w-[1px] bg-gray-500"></div>
+
+    <button (click)="exportCanvas()">
+      <ng-icon name="heroArrowDownTray" class="text-2xl" />
+    </button>
   </div>
 
-  <div #container class="bg-gray-200"></div>
+  <div #container (contextmenu)="openContextMenu($event); (false)"></div>
 </main>
 
 <aside>

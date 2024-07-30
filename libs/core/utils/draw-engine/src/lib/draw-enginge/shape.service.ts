@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 import Konva from 'konva';
 import { Node } from 'konva/lib/Node';
 
@@ -11,11 +11,36 @@ export class ShapeService {
   static rectangularStaticCount = 0;
   static layerStaticCount = 0;
 
+  #transformer = signal<Konva.Transformer | null>(null);
+
+  selectedShape = signal<Konva.Shape | null>(null);
+
   layers = signal<Konva.Layer[]>([
     new Konva.Layer({
       name: `Layer ${ShapeService.layerStaticCount++}`,
     }),
   ]);
+
+  constructor() {
+    effect(() => {
+      const shape = this.selectedShape();
+      const allShapes = this.layers().flatMap((layer) => layer.getChildren());
+
+      allShapes.forEach((s) => {
+        if (!(s instanceof Konva.Group)) {
+          if (shape && s.id() === shape.id()) {
+            s.stroke('dodgerblue');
+            s.strokeWidth(4);
+
+            s.dash([10, 5]);
+          } else {
+            s.stroke('none');
+            s.strokeWidth(0);
+          }
+        }
+      });
+    });
+  }
 
   #addShape(stage: Konva.Stage, layer: Konva.Layer, shape: Konva.Shape): void {
     stage.getChildren;
@@ -37,6 +62,10 @@ export class ShapeService {
       id: `rect-${ShapeService.rectangularStaticCount++}`,
     });
 
+    rect.on('click', () => {
+      this.selectedShape.set(rect);
+    });
+
     this.#addShape(stage, layer, rect);
   }
 
@@ -48,6 +77,10 @@ export class ShapeService {
       fill: 'green',
       draggable: true,
       id: `circle-${ShapeService.circleStaticCount++}`,
+    });
+
+    circle.on('click', () => {
+      this.selectedShape.set(circle);
     });
 
     this.#addShape(stage, layer, circle);
@@ -64,7 +97,48 @@ export class ShapeService {
       id: `triangle-${ShapeService.trinagleStaticCount++}`,
     });
 
+    triangle.on('click', () => {
+      this.selectedShape.set(triangle);
+    });
+
+    this.selectedShape.set(triangle);
+
     this.#addShape(stage, layer, triangle);
+  }
+
+  addLineShape(stage: Konva.Stage, layer: Konva.Layer): void {
+    const line = new Konva.Line({
+      points: [73, 70, 340, 23, 450, 60, 500, 20],
+      stroke: 'black',
+      tension: 1,
+      draggable: true,
+      id: `line-${ShapeService.trinagleStaticCount++}`,
+    });
+
+    line.on('click', () => {
+      this.selectedShape.set(line);
+    });
+
+    this.#addShape(stage, layer, line);
+  }
+
+  addTextShape(stage: Konva.Stage, layer: Konva.Layer): void {
+    const text = new Konva.Text({
+      x: 10,
+      y: 10,
+      text: 'Text',
+      fontSize: 20,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      draggable: true,
+      id: `text-${ShapeService.trinagleStaticCount++}`,
+    });
+
+    text.on('click', () => {
+      this.selectedShape.set(text);
+    });
+
+    this.#addShape(stage, layer, text);
   }
 
   deleteShape(stage: Konva.Stage, shape: Node): void {
@@ -81,7 +155,7 @@ export class ShapeService {
     this.layers.set([...stage.getChildren()]);
   }
 
-  addLayer(stage: Konva.Stage): void {
+  addLayer(stage: Konva.Stage) {
     const layer = new Konva.Layer({
       name: `Layer ${ShapeService.layerStaticCount++}`,
     });
@@ -89,11 +163,43 @@ export class ShapeService {
     stage.draw();
 
     this.layers.set([...stage.getChildren()]);
+
+    return layer;
   }
 
   clearCanvas(stage: Konva.Stage): void {
     stage.destroyChildren();
     stage.draw();
+
+    this.layers.set([...stage.getChildren()]);
+  }
+
+  setSelectedShape(shape: Konva.Shape | null): void {
+    this.selectedShape.set(shape);
+  }
+
+  addTransformer(
+    stage: Konva.Stage,
+    layer: Konva.Layer,
+    shapes: Konva.Shape[],
+  ): void {
+    const transformer = new Konva.Transformer();
+    layer.add(transformer);
+
+    transformer.nodes(shapes);
+    this.#transformer.set(transformer);
+
+    this.layers.set([...stage.getChildren()]);
+  }
+
+  stopTransformer(stage: Konva.Stage): void {
+    const transformer = this.#transformer();
+
+    console.log('transformer', transformer);
+
+    if (transformer) {
+      transformer.destroy();
+    }
 
     this.layers.set([...stage.getChildren()]);
   }
