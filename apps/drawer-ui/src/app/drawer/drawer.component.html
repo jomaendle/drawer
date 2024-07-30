@@ -62,10 +62,10 @@
     </button>
   </div>
 
-  <div #container (contextmenu)="openContextMenu($event); (false)"></div>
+  <div #container class="overflow-x-hidden bg-gray-50" (contextmenu)="openContextMenu($event); (false)"></div>
 </main>
 
-<aside>
+<aside class="flex h-full overflow-y-auto">
   <app-layer-explorer
     [stage]="stage()"
     [layers]="layers()"

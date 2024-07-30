@@ -13,7 +13,7 @@ export class ShapeService {
 
   #transformer = signal<Konva.Transformer | null>(null);
 
-  selectedShape = signal<Konva.Shape | null>(null);
+  selectedShape = signal<Konva.Node | null>(null);
 
   layers = signal<Konva.Layer[]>([
     new Konva.Layer({
@@ -101,7 +101,6 @@ export class ShapeService {
       this.selectedShape.set(triangle);
     });
 
-    this.selectedShape.set(triangle);
 
     this.#addShape(stage, layer, triangle);
   }
@@ -181,7 +180,7 @@ export class ShapeService {
   addTransformer(
     stage: Konva.Stage,
     layer: Konva.Layer,
-    shapes: Konva.Shape[],
+    shapes: Konva.Node[],
   ): void {
     const transformer = new Konva.Transformer();
     layer.add(transformer);
@@ -195,8 +194,6 @@ export class ShapeService {
   stopTransformer(stage: Konva.Stage): void {
     const transformer = this.#transformer();
 
-    console.log('transformer', transformer);
-
     if (transformer) {
       transformer.destroy();
     }
@@ -207,7 +204,7 @@ export class ShapeService {
   copyShape(
     stage: Konva.Stage,
     layer: Konva.Layer | null | undefined,
-    shape: Konva.Shape,
+    shape: Konva.Node,
   ): void {
     const newShape = shape.clone({
       x: shape.x() + 10,

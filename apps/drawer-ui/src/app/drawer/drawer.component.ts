@@ -36,6 +36,7 @@ import {
   ],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.css',
+  host: { class: 'flex flex-col h-full overflow-hidden' },
 })
 export class DrawerComponent {
   container = viewChild.required<ElementRef<HTMLDivElement>>('container');
@@ -55,11 +56,11 @@ export class DrawerComponent {
     const stage = new Konva.Stage({
       container: this.container().nativeElement,
       width: windowWidth,
-      fill: 'red',
       height: 600,
     });
 
     stage.on('click', (e) => {
+      console.log('click', e.target);
       const isTargetShape = e.target instanceof Konva.Shape;
       this.#shapeService.selectedShape.set(
         isTargetShape ? (e.target as Konva.Shape) : null,
@@ -80,10 +81,6 @@ export class DrawerComponent {
   );
 
   constructor(private gridService: GridService) {
-    effect(() => {
-      const c = this.#shapeService.layers();
-      console.log('this.#shapeService.layerChanged', c);
-    });
 
     this.isTransformKey$
       .pipe(takeUntilDestroyed())
@@ -278,7 +275,7 @@ export class DrawerComponent {
     });
   }
 
-  deleteShape(shape: Konva.Shape): void {
+  deleteShape(shape: Konva.Node): void {
     const id = shape.attrs.id;
     const shapeFound = this.stage().findOne(`#${id}`);
 

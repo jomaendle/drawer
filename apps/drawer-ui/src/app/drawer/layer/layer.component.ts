@@ -20,34 +20,20 @@ import { GroupComponent } from '../group/group.component';
   imports: [CommonModule, GroupComponent],
   templateUrl: './layer.component.html',
   styleUrl: './layer.component.css',
+  host: {class: 'block overflow-hidden'},
 })
-export class LayerComponent implements OnChanges {
+export class LayerComponent  {
+  stage = input.required<Konva.Stage>();
   layer = input.required<Konva.Layer>();
   toggle = output<Konva.Layer>();
 
   shapeService = inject(ShapeService);
 
-  groups: Signal<Konva.Group[]> = computed(
-    () =>
-      this.layer().getChildren(
-        (node) => node instanceof Konva.Group || node instanceof Konva.Layer,
-      ) as Konva.Group[],
-  );
+ onShapeClick(shape: Konva.Node) {
 
-  shapes = computed(
-    () =>
-      this.layer().getChildren(
-        (node) => node instanceof Konva.Shape,
-      ) as Konva.Shape[],
-  );
-
-  constructor() {
-    effect(() => {
-      console.log('LayerComponent', this.layer());
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('LayerComponent', changes);
-  }
+   const res = this.stage().findOne(`#${shape.attrs.id}`);
+   if (res) {
+    this.shapeService.selectedShape.set(res as Konva.Shape);
+   }
+ }
 }

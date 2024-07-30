@@ -3,8 +3,8 @@
   <button (click)="selectAll()">Select All Layers</button>
   <button (click)="deselectAll()">Deselect All Layers</button>
 </div>
-<div class="layer-tree">
+<div class="layer-tree flex flex-col h-full overflow-y-auto">
   @for (layer of layers(); let index = $index; track index) {
-    <app-layer [layer]="layer" (toggle)="toggleLayer($event)"></app-layer>
+    <app-layer [stage]="stage()" [layer]="layer" (toggle)="toggleLayer($event)"></app-layer>
   }
 </div>

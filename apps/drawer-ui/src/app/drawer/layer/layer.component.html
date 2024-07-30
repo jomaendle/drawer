@@ -1,12 +1,12 @@
-<div class="layer">
-  <div class="layer-header" (click)="toggle.emit(layer())">
+<details open class="my-4 text-sm cursor-pointer mx-4">
+  <summary class="layer-header" (click)="toggle.emit(layer())">
     {{ layer().name() }}
-  </div>
-  <div class="layer-content">
+  </summary>
+  <div class="mx-8">
     @for (child of layer().toObject().children; track child.attrs.id) {
-      <div>
+      <div class="hover:bg-blue-100 px-2 py-0.5 rounded-md transition-colors" (click)="onShapeClick(child)">
         {{ child.attrs.id }}
       </div>
     }
   </div>
-</div>
+</details>
