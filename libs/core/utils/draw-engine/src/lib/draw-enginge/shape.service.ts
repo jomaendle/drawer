@@ -6,11 +6,16 @@ import { Node } from 'konva/lib/Node';
   providedIn: 'root',
 })
 export class ShapeService {
-  layers = signal<Node[]>([]);
-
   static trinagleStaticCount = 0;
   static circleStaticCount = 0;
   static rectangularStaticCount = 0;
+  static layerStaticCount = 0;
+
+  layers = signal<Konva.Layer[]>([
+    new Konva.Layer({
+      name: `Layer ${ShapeService.layerStaticCount++}`,
+    }),
+  ]);
 
   #addShape(stage: Konva.Stage, layer: Konva.Layer, shape: Konva.Shape): void {
     stage.getChildren;
@@ -71,6 +76,23 @@ export class ShapeService {
 
   deleteLayer(stage: Konva.Stage, layer: Node): void {
     layer.destroy();
+    stage.draw();
+
+    this.layers.set([...stage.getChildren()]);
+  }
+
+  addLayer(stage: Konva.Stage): void {
+    const layer = new Konva.Layer({
+      name: `Layer ${ShapeService.layerStaticCount++}`,
+    });
+    stage.add(layer);
+    stage.draw();
+
+    this.layers.set([...stage.getChildren()]);
+  }
+
+  clearCanvas(stage: Konva.Stage): void {
+    stage.destroyChildren();
     stage.draw();
 
     this.layers.set([...stage.getChildren()]);

@@ -28,36 +28,34 @@
       </svg>
     </button>
 
+    <div class="h-10 w-[1px] bg-gray-500"></div>
+
+    <button (click)="addLayer()">Add Layer</button>
+
     <button (click)="clearCanvas()" class="flex items-center gap-1">
       <ng-icon name="heroXCircle" class="text-2xl" />
       Clear Canvas
     </button>
   </div>
 
-  <div #container class="h-[600px] w-[800px] bg-gray-200"></div>
+  <div #container class="bg-gray-200"></div>
 </main>
 
 <aside>
-  @for (layer of layers(); track layer.id) {
-    <div class="flex items-start gap-2">
+  @for (layer of layers(); track layer.name) {
+    <div class="flex items-start gap-2 border p-1">
+      <span>{{ layer.name() }}</span>
+
       <div>
         @for (child of layer.toObject().children; track child.attrs.id) {
-          <div class="rounded-md border border-gray-300 p-2">
-            {{ child.attrs.id }}
+          <div
+            class="flex items-center gap-2 rounded-md border border-gray-300 p-2"
+          >
+            <span class="flex-1">
+              {{ child.attrs.id }}
+            </span>
 
-            <button (click)="selectShape(child)">
-              <svg width="16" height="16">
-                <rect
-                  width="16"
-                  height="16"
-                  style="
-                    fill: transparent;
-                    stroke-width: 3;
-                    stroke: rgb(0, 0, 0);
-                  "
-                />
-              </svg>
-            </button>
+            <button (click)="selectShape(child)">Select</button>
 
             <button (click)="deleteShape(child)">
               <ng-icon name="heroTrash" class="text-2xl" />

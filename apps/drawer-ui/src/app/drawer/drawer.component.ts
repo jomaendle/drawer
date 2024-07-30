@@ -25,17 +25,21 @@ export class DrawerComponent {
 
   #shapeService = inject(ShapeService);
 
-  initialLayer = new Konva.Layer();
+  layers = this.#shapeService.layers;
+
+  layer = computed(() => {
+    return this.layers().at(-1);
+  });
 
   stage = computed(() => {
+    const windowWidth = window.innerWidth;
+
     return new Konva.Stage({
       container: this.container().nativeElement,
-      width: 800,
+      width: windowWidth,
       height: 600,
     });
   });
-
-  layers = this.#shapeService.layers;
 
   constructor(private gridService: GridService) {
     effect(() => {
@@ -45,21 +49,40 @@ export class DrawerComponent {
   }
 
   addRectangularShape(): void {
-    this.#shapeService.addRectangularShape(this.stage(), this.initialLayer);
+    const layer = this.layer();
+
+    if (!layer) {
+      console.error('No layer found');
+      return;
+    }
+
+    this.#shapeService.addRectangularShape(this.stage(), layer);
   }
 
   addCircleShape(): void {
-    this.#shapeService.addCircleShape(this.stage(), this.initialLayer);
+    const layer = this.layer();
+
+    if (!layer) {
+      console.error('No layer found');
+      return;
+    }
+
+    this.#shapeService.addCircleShape(this.stage(), layer);
   }
 
   addTriangleShape(): void {
-    this.#shapeService.addTriangleShape(this.stage(), this.initialLayer);
+    const layer = this.layer();
+
+    if (!layer) {
+      console.error('No layer found');
+      return;
+    }
+
+    this.#shapeService.addTriangleShape(this.stage(), layer);
   }
 
   clearCanvas(): void {
-    const stage = this.stage();
-    stage.destroyChildren();
-    stage.draw();
+    this.#shapeService.clearCanvas(this.stage());
   }
 
   selectLayer(layer: Node): void {
@@ -94,5 +117,9 @@ export class DrawerComponent {
 
   deleteLayer(layer: Node): void {
     this.#shapeService.deleteLayer(this.stage(), layer);
+  }
+
+  addLayer(): void {
+    this.#shapeService.addLayer(this.stage());
   }
 }
