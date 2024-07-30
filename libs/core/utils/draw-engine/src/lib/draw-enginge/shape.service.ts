@@ -1,69 +1,78 @@
 import { Injectable, signal } from '@angular/core';
-
-export interface Shape {
-  type: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  radius: number;
-  color: string;
-  layer: number;
-  isHovered?: boolean;
-  isSelected?: boolean;
-}
+import Konva from 'konva';
+import { Node } from 'konva/lib/Node';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ShapeService {
-  shapes = signal<Shape[]>([]);
+  layers = signal<Node[]>([]);
 
-  addShape(shape: Shape): void {
-    this.shapes.set([...this.shapes(), shape]);
+  static trinagleStaticCount = 0;
+  static circleStaticCount = 0;
+  static rectangularStaticCount = 0;
+
+  #addShape(stage: Konva.Stage, layer: Konva.Layer, shape: Konva.Shape): void {
+    stage.getChildren;
+    layer.add(shape);
+    stage.add(layer);
+    layer.draw();
+
+    this.layers.set([...stage.getChildren()]);
   }
 
-  updateShapes(shapes: Shape[]): void {
-    this.shapes.set(shapes);
+  addRectangularShape(stage: Konva.Stage, layer: Konva.Layer): void {
+    const rect = new Konva.Rect({
+      x: 20,
+      y: 20,
+      width: 100,
+      height: 100,
+      fill: 'red',
+      draggable: true,
+      id: `rect-${ShapeService.rectangularStaticCount++}`,
+    });
+
+    this.#addShape(stage, layer, rect);
   }
 
-  deleteShape(shape: Shape): void {
-    this.shapes.set(this.shapes().filter((s) => s !== shape));
+  addCircleShape(stage: Konva.Stage, layer: Konva.Layer): void {
+    const circle = new Konva.Circle({
+      x: 100,
+      y: 100,
+      radius: 50,
+      fill: 'green',
+      draggable: true,
+      id: `circle-${ShapeService.circleStaticCount++}`,
+    });
+
+    this.#addShape(stage, layer, circle);
   }
 
-  clearShapes(): void {
-    this.shapes.set([]);
+  addTriangleShape(stage: Konva.Stage, layer: Konva.Layer): void {
+    const triangle = new Konva.RegularPolygon({
+      x: 200,
+      y: 200,
+      sides: 3,
+      radius: 50,
+      fill: 'blue',
+      draggable: true,
+      id: `triangle-${ShapeService.trinagleStaticCount++}`,
+    });
+
+    this.#addShape(stage, layer, triangle);
   }
 
-  updateShapeColor(shape: Shape, color: string): void {
-    this.shapes.set(
-      this.shapes().map((s) => (s === shape ? { ...s, color } : s)),
-    );
+  deleteShape(stage: Konva.Stage, shape: Node): void {
+    shape.destroy();
+    stage.draw();
+
+    this.layers.set([...stage.getChildren()]);
   }
 
-  selectShape(shape: Shape | null): void {
-    if (!shape) {
-      return;
-    }
+  deleteLayer(stage: Konva.Stage, layer: Node): void {
+    layer.destroy();
+    stage.draw();
 
-    this.shapes.set(
-      this.shapes().map((s) => ({
-        ...s,
-        isSelected: s === shape,
-      })),
-    );
-  }
-
-  getSelectedShape(): Shape | null {
-    return this.shapes().find((s) => s.isSelected) || null;
-  }
-
-  resetSelection(): void {
-    this.shapes.set(
-      this.shapes().map((s) => ({
-        ...s,
-        isSelected: false,
-      })),
-    );
+    this.layers.set([...stage.getChildren()]);
   }
 }
