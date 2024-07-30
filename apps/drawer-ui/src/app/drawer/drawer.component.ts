@@ -169,7 +169,9 @@ export class DrawerComponent {
     }
 
     this.drawAllShapes();
-    this.drawShape(this.currentShape);
+    requestAnimationFrame(
+      () => this.currentShape && this.drawShape(this.currentShape),
+    );
   }
 
   stopDrawing(): void {
@@ -204,8 +206,9 @@ export class DrawerComponent {
       } else if (shape.type === 'circle') {
         this.ctx.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI);
       }
-      this.ctx.stroke();
     }
+
+    this.ctx.stroke();
 
     this.ctx.closePath();
   }
@@ -228,7 +231,7 @@ export class DrawerComponent {
     this.shapeService
       .shapes()
       .sort((a, b) => a.layer - b.layer)
-      .forEach((shape) => this.drawShape(shape));
+      .forEach((shape) => requestAnimationFrame(() => this.drawShape(shape)));
   }
 
   addRectangle(): void {
