@@ -1,5 +1,5 @@
 <main>
-  <div class="flex gap-3 bg-gray-300 p-2">
+  <div class="flex gap-3 p-2 bg-gray-300">
     <button (click)="addRectangularShape()">
       <svg width="16" height="16">
         <rect
@@ -66,14 +66,18 @@
 </main>
 
 <aside>
-  @for (layer of layers(); track layer.name()) {
-    <div class="flex items-start gap-2 border p-1">
+  <app-layer-explorer
+    [stage]="stage()"
+    [layers]="layers()"
+  ></app-layer-explorer>
+  <!-- @for (layer of layers(); track layer.name()) {
+    <div class="flex items-start gap-2 p-1 border">
       <span>{{ layer.name() }}</span>
 
       <div>
         @for (child of layer.toObject().children; track child.attrs.id) {
           <div
-            class="flex items-center gap-2 rounded-md border border-gray-300 p-2"
+            class="flex items-center gap-2 p-2 border border-gray-300 rounded-md"
           >
             <span class="flex-1">
               {{ child.attrs.id }}
@@ -92,6 +96,5 @@
       <button (click)="deleteLayer(layer)">
         <ng-icon name="heroTrash" class="text-2xl" />
       </button>
-    </div>
-  }
+    </div> -->
 </aside>

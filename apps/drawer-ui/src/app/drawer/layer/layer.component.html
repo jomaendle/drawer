@@ -1,0 +1,12 @@
+<div class="layer">
+  <div class="layer-header" (click)="toggle.emit(layer())">
+    {{ layer().name() }}
+  </div>
+  <div class="layer-content">
+    @for (child of layer().toObject().children; track child.attrs.id) {
+      <div>
+        {{ child.attrs.id }}
+      </div>
+    }
+  </div>
+</div>

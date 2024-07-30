@@ -1,0 +1,10 @@
+<div class="controls">
+  <button (click)="toggleExpandAll()">Expand/Collapse All</button>
+  <button (click)="selectAll()">Select All Layers</button>
+  <button (click)="deselectAll()">Deselect All Layers</button>
+</div>
+<div class="layer-tree">
+  @for (layer of layers(); let index = $index; track index) {
+    <app-layer [layer]="layer" (toggle)="toggleLayer($event)"></app-layer>
+  }
+</div>

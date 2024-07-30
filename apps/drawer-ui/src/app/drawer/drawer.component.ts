@@ -16,6 +16,8 @@ import { NgIcon } from '@ng-icons/core';
 import Konva from 'konva';
 import { Node } from 'konva/lib/Node';
 import { filter, fromEvent, map, skip } from 'rxjs';
+import { LayerExplorerComponent } from './layer-explorer/layer-explorer.component';
+import { LayerComponent } from './layer/layer.component';
 import {
   ContextAction,
   ShapeContextMenuComponent,
@@ -29,6 +31,8 @@ import {
     ReactiveFormsModule,
     NgIcon,
     ShapeContextMenuComponent,
+    LayerComponent,
+    LayerExplorerComponent,
   ],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.css',

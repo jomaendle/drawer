@@ -1,0 +1,10 @@
+<div class="group">
+  <div class="group-header">
+    {{ group().name() }}
+  </div>
+  <div class="group-content">
+    <ng-container *ngFor="let shape of group().getChildren()">
+      <div>{{ shape.name }}</div>
+    </ng-container>
+  </div>
+</div>
