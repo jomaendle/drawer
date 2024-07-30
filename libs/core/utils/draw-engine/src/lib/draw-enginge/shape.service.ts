@@ -203,4 +203,23 @@ export class ShapeService {
 
     this.layers.set([...stage.getChildren()]);
   }
+
+  copyShape(
+    stage: Konva.Stage,
+    layer: Konva.Layer | null | undefined,
+    shape: Konva.Shape,
+  ): void {
+    const newShape = shape.clone({
+      x: shape.x() + 10,
+      y: shape.y() + 10,
+    });
+
+    newShape.id(`${newShape.id()}-copy`);
+
+    newShape.on('click', () => {
+      this.selectedShape.set(newShape);
+    });
+
+    this.#addShape(stage, layer || this.addLayer(stage), newShape);
+  }
 }

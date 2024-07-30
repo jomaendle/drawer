@@ -1,1 +1,10 @@
-<p>shape-context-menu works!</p>
+<button (click)="selection.emit('copy')">Copy</button>
+<button (click)="selection.emit('transform')">Transform</button>
+<hr />
+<button (click)="selection.emit('moveToTop')">Move To Top</button>
+<button (click)="selection.emit('moveUp')">Move Up</button>
+<button (click)="selection.emit('moveDown')">Move Down</button>
+<button (click)="selection.emit('moveToBottom')">Move To Bottom</button>
+
+<hr />
+<button (click)="selection.emit('delete')">Delete</button>

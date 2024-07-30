@@ -16,7 +16,10 @@ import { NgIcon } from '@ng-icons/core';
 import Konva from 'konva';
 import { Node } from 'konva/lib/Node';
 import { filter, fromEvent, map, skip } from 'rxjs';
-import { ShapeContextMenuComponent } from './shape-context-menu/shape-context-menu.component';
+import {
+  ContextAction,
+  ShapeContextMenuComponent,
+} from './shape-context-menu/shape-context-menu.component';
 @Component({
   selector: 'app-drawer',
   standalone: true,
@@ -185,11 +188,12 @@ export class DrawerComponent {
       positionStrategy: this.#overlay
         .position()
         .global()
-        .left(event.clientX + 20 + 'px')
-        .top(event.clientY + 'px'),
+        .left(event.clientX + 12 + 'px')
+        .top(event.clientY + 12 + 'px'),
     });
 
     const portal = new ComponentPortal(ShapeContextMenuComponent);
+
     ref
       .outsidePointerEvents()
       .pipe(skip(1))
@@ -197,7 +201,45 @@ export class DrawerComponent {
         ref.dispose();
       });
 
-    ref.attach(portal);
+    const compRef = ref.attach(portal);
+
+    compRef.instance.selection.subscribe((action: ContextAction) => {
+      const selectedShape = this.#shapeService.selectedShape();
+
+      if (!selectedShape) {
+        ref.dispose();
+        return;
+      }
+
+      switch (action) {
+        case 'transform':
+          this.addTransformer();
+          break;
+        case 'delete':
+          this.deleteShape(selectedShape);
+          break;
+        case 'moveUp':
+          selectedShape.moveUp();
+          break;
+        case 'moveDown':
+          selectedShape.moveDown();
+          break;
+        case 'moveToTop':
+          selectedShape.moveToTop();
+          break;
+        case 'moveToBottom':
+          selectedShape.moveToBottom();
+          break;
+        case 'copy':
+          this.#shapeService.copyShape(
+            this.stage(),
+            this.layer(),
+            selectedShape,
+          );
+      }
+
+      ref.dispose();
+    });
   }
 
   exportCanvas(): void {
