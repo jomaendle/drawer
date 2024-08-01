@@ -1,5 +1,5 @@
 <main>
-  <div class="flex gap-3 p-2 bg-gray-300">
+  <div class="flex gap-3 bg-gray-300 p-2">
     <button (click)="addRectangularShape()">
       <svg width="16" height="16">
         <rect
@@ -62,39 +62,24 @@
     </button>
   </div>
 
-  <div #container class="overflow-x-hidden bg-gray-50" (contextmenu)="openContextMenu($event); (false)"></div>
+  <div
+    #container
+    class="overflow-x-hidden bg-gray-50"
+    (contextmenu)="
+      shapeContextMenuService.openContextMenu($event, stage(), layer()); (false)
+    "
+  ></div>
 </main>
 
 <aside class="flex h-full overflow-y-auto">
   <app-layer-explorer
+    class="h-full flex-1 overflow-y-auto"
     [stage]="stage()"
     [layers]="layers()"
   ></app-layer-explorer>
-  <!-- @for (layer of layers(); track layer.name()) {
-    <div class="flex items-start gap-2 p-1 border">
-      <span>{{ layer.name() }}</span>
-
-      <div>
-        @for (child of layer.toObject().children; track child.attrs.id) {
-          <div
-            class="flex items-center gap-2 p-2 border border-gray-300 rounded-md"
-          >
-            <span class="flex-1">
-              {{ child.attrs.id }}
-            </span>
-
-            <button (click)="selectShape(child)">Select</button>
-
-            <button (click)="deleteShape(child)">
-              <ng-icon name="heroTrash" class="text-2xl" />
-            </button>
-          </div>
-        }
-      </div>
-
-      <button (click)="selectLayer(layer)">Select</button>
-      <button (click)="deleteLayer(layer)">
-        <ng-icon name="heroTrash" class="text-2xl" />
-      </button>
-    </div> -->
+  <app-properties-panel
+    [selectedShape]="shapeService.selectedShape()"
+    (shapeUpdated)="shapeService.updateShape($event, this.stage())"
+    class="h-full flex-1"
+  />
 </aside>

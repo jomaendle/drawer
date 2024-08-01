@@ -1,10 +1,14 @@
-<div class="controls">
+<div class="flex items-center gap-4 px-4 pt-4">
   <button (click)="toggleExpandAll()">Expand/Collapse All</button>
   <button (click)="selectAll()">Select All Layers</button>
   <button (click)="deselectAll()">Deselect All Layers</button>
 </div>
-<div class="layer-tree flex flex-col h-full overflow-y-auto">
+<div class="layer-tree flex h-full flex-col overflow-y-auto">
   @for (layer of layers(); let index = $index; track index) {
-    <app-layer [stage]="stage()" [layer]="layer" (toggle)="toggleLayer($event)"></app-layer>
+    <app-layer
+      [stage]="stage()"
+      [layer]="layer"
+      (toggle)="toggleLayer($event)"
+    ></app-layer>
   }
 </div>

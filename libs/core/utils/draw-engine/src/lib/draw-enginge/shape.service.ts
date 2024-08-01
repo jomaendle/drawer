@@ -6,7 +6,7 @@ import { Node } from 'konva/lib/Node';
   providedIn: 'root',
 })
 export class ShapeService {
-  static trinagleStaticCount = 0;
+  static triangleStaticCount = 0;
   static circleStaticCount = 0;
   static rectangularStaticCount = 0;
   static layerStaticCount = 0;
@@ -22,6 +22,10 @@ export class ShapeService {
   ]);
 
   constructor() {
+    const rect = new Konva.Rect();
+    // log all properties of the Konva.Rect object
+    console.log(Object.keys(rect.attrs));
+
     effect(() => {
       const shape = this.selectedShape();
       const allShapes = this.layers().flatMap((layer) => layer.getChildren());
@@ -94,13 +98,12 @@ export class ShapeService {
       radius: 50,
       fill: 'blue',
       draggable: true,
-      id: `triangle-${ShapeService.trinagleStaticCount++}`,
+      id: `triangle-${ShapeService.triangleStaticCount++}`,
     });
 
     triangle.on('click', () => {
       this.selectedShape.set(triangle);
     });
-
 
     this.#addShape(stage, layer, triangle);
   }
@@ -111,7 +114,7 @@ export class ShapeService {
       stroke: 'black',
       tension: 1,
       draggable: true,
-      id: `line-${ShapeService.trinagleStaticCount++}`,
+      id: `line-${ShapeService.triangleStaticCount++}`,
     });
 
     line.on('click', () => {
@@ -130,7 +133,7 @@ export class ShapeService {
       fontFamily: 'Calibri',
       fill: 'black',
       draggable: true,
-      id: `text-${ShapeService.trinagleStaticCount++}`,
+      id: `text-${ShapeService.triangleStaticCount++}`,
     });
 
     text.on('click', () => {
@@ -218,5 +221,17 @@ export class ShapeService {
     });
 
     this.#addShape(stage, layer || this.addLayer(stage), newShape);
+  }
+
+  updateShape(shape: Konva.Node, stage: Konva.Stage) {
+    const item = stage.findOne((l: any) => l.attrs.id === shape.attrs.id);
+
+    if (!item) {
+      return;
+    }
+
+    item.setAttrs(shape.attrs);
+
+    console.log('item', item.attrs, shape.attrs);
   }
 }

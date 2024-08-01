@@ -22,6 +22,8 @@ import {
   ContextAction,
   ShapeContextMenuComponent,
 } from './shape-context-menu/shape-context-menu.component';
+import { PropertiesPanelComponent } from './properties-panel/properties-panel.component';
+import { ShapeContextMenuService } from './shape-context-menu/shape-context-menu.service';
 @Component({
   selector: 'app-drawer',
   standalone: true,
@@ -33,6 +35,7 @@ import {
     ShapeContextMenuComponent,
     LayerComponent,
     LayerExplorerComponent,
+    PropertiesPanelComponent,
   ],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.css',
@@ -41,10 +44,10 @@ import {
 export class DrawerComponent {
   container = viewChild.required<ElementRef<HTMLDivElement>>('container');
 
-  #shapeService = inject(ShapeService);
-  #overlay = inject(Overlay);
+  shapeService = inject(ShapeService);
+  shapeContextMenuService = inject(ShapeContextMenuService);
 
-  layers = this.#shapeService.layers;
+  layers = this.shapeService.layers;
 
   layer = computed(() => {
     return this.layers().at(-1);
@@ -62,7 +65,7 @@ export class DrawerComponent {
     stage.on('click', (e) => {
       console.log('click', e.target);
       const isTargetShape = e.target instanceof Konva.Shape;
-      this.#shapeService.selectedShape.set(
+      this.shapeService.selectedShape.set(
         isTargetShape ? (e.target as Konva.Shape) : null,
       );
     });
@@ -81,14 +84,13 @@ export class DrawerComponent {
   );
 
   constructor(private gridService: GridService) {
-
     this.isTransformKey$
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.addTransformer());
 
     this.isEnterKey$
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.#shapeService.stopTransformer(this.stage()));
+      .subscribe(() => this.shapeService.stopTransformer(this.stage()));
   }
 
   addRectangularShape(): void {
@@ -97,13 +99,13 @@ export class DrawerComponent {
     if (!layer) {
       console.info('No layer found, creating a new one');
 
-      this.#shapeService.addLayer(this.stage());
+      this.shapeService.addLayer(this.stage());
       this.addRectangularShape();
 
       return;
     }
 
-    this.#shapeService.addRectangularShape(this.stage(), layer);
+    this.shapeService.addRectangularShape(this.stage(), layer);
   }
 
   addTransformer(): void {
@@ -112,20 +114,20 @@ export class DrawerComponent {
     if (!layer) {
       console.info('No layer found, creating a new one');
 
-      this.#shapeService.addLayer(this.stage());
+      this.shapeService.addLayer(this.stage());
       this.addTransformer();
 
       return;
     }
 
-    const selectedShape = this.#shapeService.selectedShape();
+    const selectedShape = this.shapeService.selectedShape();
 
     if (!selectedShape) {
       console.error('No shape selected');
       return;
     }
 
-    this.#shapeService.addTransformer(this.stage(), layer, [selectedShape]);
+    this.shapeService.addTransformer(this.stage(), layer, [selectedShape]);
   }
 
   addCircleShape(): void {
@@ -134,13 +136,13 @@ export class DrawerComponent {
     if (!layer) {
       console.info('No layer found, creating a new one');
 
-      this.#shapeService.addLayer(this.stage());
+      this.shapeService.addLayer(this.stage());
       this.addCircleShape();
 
       return;
     }
 
-    this.#shapeService.addCircleShape(this.stage(), layer);
+    this.shapeService.addCircleShape(this.stage(), layer);
   }
 
   addTriangleShape(): void {
@@ -149,12 +151,12 @@ export class DrawerComponent {
     if (!layer) {
       console.info('No layer found, creating a new one');
 
-      this.#shapeService.addLayer(this.stage());
+      this.shapeService.addLayer(this.stage());
       this.addTriangleShape();
       return;
     }
 
-    this.#shapeService.addTriangleShape(this.stage(), layer);
+    this.shapeService.addTriangleShape(this.stage(), layer);
   }
 
   addLineShape(): void {
@@ -165,7 +167,7 @@ export class DrawerComponent {
       return;
     }
 
-    this.#shapeService.addLineShape(this.stage(), layer);
+    this.shapeService.addLineShape(this.stage(), layer);
   }
 
   addTextShape(): void {
@@ -176,71 +178,11 @@ export class DrawerComponent {
       return;
     }
 
-    this.#shapeService.addTextShape(this.stage(), layer);
+    this.shapeService.addTextShape(this.stage(), layer);
   }
 
   clearCanvas(): void {
-    this.#shapeService.clearCanvas(this.stage());
-  }
-
-  openContextMenu(event: MouseEvent): void {
-    const ref = this.#overlay.create({
-      hasBackdrop: false,
-      positionStrategy: this.#overlay
-        .position()
-        .global()
-        .left(event.clientX + 12 + 'px')
-        .top(event.clientY + 12 + 'px'),
-    });
-
-    const portal = new ComponentPortal(ShapeContextMenuComponent);
-
-    ref
-      .outsidePointerEvents()
-      .pipe(skip(1))
-      .subscribe(() => {
-        ref.dispose();
-      });
-
-    const compRef = ref.attach(portal);
-
-    compRef.instance.selection.subscribe((action: ContextAction) => {
-      const selectedShape = this.#shapeService.selectedShape();
-
-      if (!selectedShape) {
-        ref.dispose();
-        return;
-      }
-
-      switch (action) {
-        case 'transform':
-          this.addTransformer();
-          break;
-        case 'delete':
-          this.deleteShape(selectedShape);
-          break;
-        case 'moveUp':
-          selectedShape.moveUp();
-          break;
-        case 'moveDown':
-          selectedShape.moveDown();
-          break;
-        case 'moveToTop':
-          selectedShape.moveToTop();
-          break;
-        case 'moveToBottom':
-          selectedShape.moveToBottom();
-          break;
-        case 'copy':
-          this.#shapeService.copyShape(
-            this.stage(),
-            this.layer(),
-            selectedShape,
-          );
-      }
-
-      ref.dispose();
-    });
+    this.shapeService.clearCanvas(this.stage());
   }
 
   exportCanvas(): void {
@@ -275,22 +217,11 @@ export class DrawerComponent {
     });
   }
 
-  deleteShape(shape: Konva.Node): void {
-    const id = shape.attrs.id;
-    const shapeFound = this.stage().findOne(`#${id}`);
-
-    if (!shapeFound) {
-      return;
-    }
-
-    this.#shapeService.deleteShape(this.stage(), shapeFound);
-  }
-
   deleteLayer(layer: Node): void {
-    this.#shapeService.deleteLayer(this.stage(), layer);
+    this.shapeService.deleteLayer(this.stage(), layer);
   }
 
   addLayer(): void {
-    this.#shapeService.addLayer(this.stage());
+    this.shapeService.addLayer(this.stage());
   }
 }

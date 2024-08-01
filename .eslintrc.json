@@ -1,8 +1,8 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nx"],
-  "extends": ["plugin:@nrwl/nx/angular"],
+  "plugins": ["@nx", "prettier"],
+  "extends": ["plugin:@nrwl/nx/angular", "prettier"],
   "rules": {
     "prettier/prettier": ["error"]
   },

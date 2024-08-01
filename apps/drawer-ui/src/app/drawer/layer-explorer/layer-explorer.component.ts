@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import Konva from 'konva';
 import { LayerComponent } from '../layer/layer.component';
 
@@ -17,12 +17,6 @@ export class LayerExplorerComponent {
   toggleExpandAll() {
     this.layers().forEach((layerData) => {
       layerData.visible() ? layerData.show() : layerData.hide();
-    });
-  }
-
-  constructor() {
-    effect(() => {
-      console.log('LayerExComponent', this.layers());
     });
   }
 

@@ -1,0 +1,8 @@
+@if (selectedShape()) {
+  <app-properties-section
+    [selectedShape]="selectedShape()"
+    (shapeUpdated)="onSubmit($event)"
+  />
+} @else {
+  <p>Select a shape to edit its properties</p>
+}

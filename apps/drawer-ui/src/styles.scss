@@ -20,4 +20,16 @@
   button {
     @apply rounded-lg border bg-gray-100 px-4 py-2 hover:bg-gray-200;
   }
+
+  input {
+    @apply border rounded-lg px-4 py-2 hover:border-gray-400 transition-colors duration-200;
+  }
+
+  input[type="checkbox"] {
+    @apply border-0;
+  }
+
+  input[type="color"] {
+    @apply p-0.5 cursor-pointer;
+  }
 }
